@@ -8,10 +8,6 @@ var PORT = 3000;
 
 var server = http.createServer(function(request, response) {
 
-  //respond to POST request with response code 200, content type : application/json, body of success : true
-  // response.writeHead(200, { "Content-Type" : "application/json" }, { "Content-Body" : { "success" : true } } );
-
-
   //store new data
   var dataBuffer = "";
 
@@ -20,6 +16,7 @@ var server = http.createServer(function(request, response) {
 
     //parse data
     dataBuffer += data;
+
     // console.log(dataBuffer);
 
   });
@@ -36,46 +33,56 @@ var server = http.createServer(function(request, response) {
 
   //Server will respond to POST request with http response code 200, content type of application/json, and body of { "success" : true}
   request.on("end", function() {
-      var data = qs.parse( dataBuffer.toString() );
+    var data = qs.parse( dataBuffer.toString() );
+    var urlData = url.parse( request.url );
     // console.log(data);
 
-    //object {key: value, ....}
-    // var query = url.parse(request.url, true).query;
     var elementName = data.elementName;
     var elementSymbol = data.elementSymbol;
     var elementAtomicNumber = data.elementAtomicNumber;
     var elementDescription = data.elementDescription;
+    var elements = elementName + '.html';
 
-    // response.end("Elements" + elementName + " " + elementSymbol + " " + elementAtomicNumber + " " + elementDescription);
+    var urlElementName = urlData.elementName;
+    var urlElementSymbol = urlData.elementSymbol;
+    var urlElementAtomicNumber = urlData.elementAtomicNumber;
+    var urlElementDescription = urlData.elementDescription;
+    var urlElements = urlElementName + '.html';
 
     // Post works, remove response.end when Get is working
-    var contents = response.end('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>The Elements - ' + elementName + '</title><link rel="stylesheet" href="/css/styles.css"></head><body><h1>' + elementName + '</h1><h2>' + elementSymbol + '</h2><h3>' + elementAtomicNumber + '</h3><p>' + elementDescription + '</p><p><a href="/">back</a></p></body></html>');
+    var contents = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>The Elements - ' + elementName + '</title><link rel="stylesheet" href="/css/styles.css"></head><body><h1>' + elementName + '</h1><h2>' + elementSymbol + '</h2><h3>' + elementAtomicNumber + '</h3><p>' + elementDescription + '</p><p><a href="/">back</a></p></body></html>';
 
-    fs.readFile('./index.html', function(error, content) {
-      if (error) {
-        response.writeHead(500);
-        response.end();
-      } else {
-        response.writeHead(200, {'Content-Type' : 'application/json'})
-        response.end(content);
-      }
-    })
+    if (request.method === 'GET') {
+        console.log("I am in the get request");
+        // console.log(elements);
 
-    //create new file with elementName
-    fs.writeFile('./public/' + elementName.toLowerCase() + '.html', contents, function(err) {
-      if(err) throw new Error('could not write file');
+      //elements should be url - parse
 
-      console.log('done writing to file');
+      fs.readFile('./public/' + urlData.path, function(err, data) {
+        console.log(urlElements);
+        if (err) {
+          response.end('./public/404.html');
+        } else
 
+          //send contents of file
+          // console.log(data.toString());
+          response.end(data.toString());
+      })
+    }
 
-    })
-    // console.log(query);
+    if (request.url === '/elements') {
+
+      //create NEW file with elementName
+      fs.writeFile('./public/' + elementName.toLowerCase() + '.html', contents, function(err) {
+        if (err) throw new Error('could not write file');
+
+        // console.log('done writing to file');
+        response.writeHead(200, { 'Content-Type' : 'application/json' });
+        // response.end(contents);
+        response.end(JSON.stringify({ 'success' : true }));
+      });
+    }
   });
-
-  //to show to postman
-  // response.write('postman start');
-  // response.end('postman end');
-
 });
 
 server.listen(PORT, function() {
