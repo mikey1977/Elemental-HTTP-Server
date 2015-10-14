@@ -48,7 +48,8 @@ var server = http.createServer(function(request, response) {
 
     // response.end("Elements" + elementName + " " + elementSymbol + " " + elementAtomicNumber + " " + elementDescription);
 
-    response.end('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>The Elements - ' + elementName + '</title><link rel="stylesheet" href="/css/styles.css"></head><body><h1>' + elementName + '</h1><h2>' + elementSymbol + '</h2><h3>' + elementAtomicNumber + '</h3><p>' + elementDescription + '</p><p><a href="/">back</a></p></body></html>');
+    // Post works, remove response.end when Get is working
+    var contents = response.end('<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>The Elements - ' + elementName + '</title><link rel="stylesheet" href="/css/styles.css"></head><body><h1>' + elementName + '</h1><h2>' + elementSymbol + '</h2><h3>' + elementAtomicNumber + '</h3><p>' + elementDescription + '</p><p><a href="/">back</a></p></body></html>');
 
     fs.readFile('./index.html', function(error, content) {
       if (error) {
@@ -61,7 +62,7 @@ var server = http.createServer(function(request, response) {
     })
 
     //create new file with elementName
-    fs.writeFile('./public/' + 'test'.toLowerCase() + '.html', function(err) {
+    fs.writeFile('./public/' + elementName.toLowerCase() + '.html', contents, function(err) {
       if(err) throw new Error('could not write file');
 
       console.log('done writing to file');
