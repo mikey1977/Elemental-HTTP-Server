@@ -21,22 +21,12 @@ var server = http.createServer(function(request, response) {
 
   });
 
-//need to parse dataBuffer in order to query
-
-  //when client performs POST request with 4 required data fields:
-    // elementName, elementSymbol, elementAtomicNumber, elementDescription
-      //put elementName into title as "<title>The Elements - " + ElementName + "</title>"
-
-  //create new file containing dynamic data, and write to public directory
-    //file name is element's name appended with html file extension
-      //e.g ./public/boron.html
-
-  //Server will respond to POST request with http response code 200, content type of application/json, and body of { "success" : true}
+  //need to parse dataBuffer in order to query
   request.on("end", function() {
     var data = qs.parse( dataBuffer.toString() );
     var urlData = url.parse( request.url );
-    // console.log(data);
 
+    // console.log(data);
     var elementName = data.elementName;
     var elementSymbol = data.elementSymbol;
     var elementAtomicNumber = data.elementAtomicNumber;
@@ -58,14 +48,17 @@ var server = http.createServer(function(request, response) {
       //elements should be parsed from url
       fs.readFile('./public/' + urlData.path, function(err, data) {
         if (err) {
-          response.writeHead(404);
-          response.end();
+          fs.readFile('./public/404.html', function(err2, data2) {
+
+          response.end(data2.toString());
+          });
+          // response.writeHead(404);
         } else
 
           //send contents of file
           // console.log(data.toString());
           response.end(data.toString());
-      })
+      });
     }
 
     if (request.url === '/elements') {
