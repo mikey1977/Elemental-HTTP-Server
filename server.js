@@ -53,15 +53,13 @@ var server = http.createServer(function(request, response) {
     var contents = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>The Elements - ' + elementName + '</title><link rel="stylesheet" href="/css/styles.css"></head><body><h1>' + elementName + '</h1><h2>' + elementSymbol + '</h2><h3>' + elementAtomicNumber + '</h3><p>' + elementDescription + '</p><p><a href="/">back</a></p></body></html>';
 
     if (request.method === 'GET') {
-        console.log("I am in the get request");
-        // console.log(elements);
 
-      //elements should be url - parse
 
+      //elements should be parsed from url
       fs.readFile('./public/' + urlData.path, function(err, data) {
-        console.log(urlElements);
         if (err) {
-          response.end('./public/404.html');
+          response.writeHead(404);
+          response.end();
         } else
 
           //send contents of file
